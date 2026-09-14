@@ -3,75 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo de Emisiones — Transporte Público | DATMUS</title>
+<title>Módulo de Emisiones — Transporte Público</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
-    --blue: #0066CC;
-    --blue-dark: #0057b3;
-    --blue-lt: #E8F2FF;
-    --blue-mid: #4A90D9;
-    --text: #1D1D1F;
-    --muted: #6E6E73;
-    --text-tert: #AEAEB2;
-    --line: rgba(20,30,50,.10);
-    --line-soft: rgba(20,30,50,.07);
-    --moss: #2f7d5f;
-    --moss-soft: rgba(47,125,95,.12);
-    --amber: #b8752e;
-    --amber-soft: rgba(184,117,46,.12);
-    --green: #248a57;
-    --red-soft: #c0392b;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --radius-lg: 16px;
-
-    /* glass tokens */
-    --glass-bg: rgba(255,255,255,.58);
-    --glass-bg-strong: rgba(255,255,255,.7);
-    --glass-bg-soft: rgba(255,255,255,.4);
-    --glass-border: rgba(255,255,255,.7);
-    --glass-border-soft: rgba(255,255,255,.45);
-    --glass-blur: blur(24px) saturate(1.6);
-    --glass-blur-soft: blur(14px) saturate(1.4);
-    --glass-shadow: 0 8px 28px rgba(20,50,90,.12), 0 1px 1px rgba(255,255,255,.6) inset;
-    --glass-shadow-sm: 0 3px 14px rgba(20,50,90,.10), 0 1px 0 rgba(255,255,255,.7) inset;
+    --ink: #1B2420;
+    --paper: #F3F1EA;
+    --panel: #FFFFFF;
+    --muted: #5C6660;
+    --text-tert: #8A938C;
+    --line: rgba(27,36,32,.16);
+    --line-soft: rgba(27,36,32,.09);
+    --moss: #2F6B4F;
+    --moss-dark: #234F3B;
+    --moss-soft: rgba(47,107,79,.10);
+    --amber: #B8752E;
+    --amber-soft: rgba(184,117,46,.10);
+    --green: #2F6B4F;
+    --red-soft: #A8432D;
+    --red-soft-bg: rgba(168,67,45,.10);
+    --radius: 8px;
+    --radius-sm: 6px;
+    --radius-lg: 10px;
+    --shadow-sm: 0 1px 2px rgba(27,36,32,.07);
+    --shadow: 0 2px 10px rgba(27,36,32,.08);
 
     font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    margin: 0; color: var(--text); -webkit-font-smoothing: antialiased;
+    margin: 0; color: var(--ink); -webkit-font-smoothing: antialiased;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at 10% 10%, rgba(70,140,255,.30), transparent 42%),
-      radial-gradient(circle at 88% 6%, rgba(60,190,210,.26), transparent 45%),
-      radial-gradient(circle at 20% 92%, rgba(90,160,255,.22), transparent 48%),
-      radial-gradient(circle at 92% 82%, rgba(80,200,190,.22), transparent 45%),
-      linear-gradient(135deg, #eef3fb 0%, #eef4f4 50%, #eaf1f6 100%);
-    background-attachment: fixed;
+    background: var(--paper);
   }
-  body::before {
-    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(circle at 15% 20%, rgba(255,255,255,.45), transparent 30%),
-      radial-gradient(circle at 80% 70%, rgba(255,255,255,.3), transparent 35%);
-    animation: driftGlow 24s ease-in-out infinite alternate;
-  }
-  @keyframes driftGlow { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(2%,-2%) scale(1.05); } }
-  @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
-  ::selection { background: #cbe0f7; color: var(--blue-dark); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  ::selection { background: var(--moss-soft); color: var(--moss-dark); }
 
-  /* ---------- Header (glass topbar) ---------- */
+  /* ---------- Header ---------- */
   .page-wrap { position: relative; z-index: 1; max-width: 1640px; margin: 0 auto; padding: 16px 24px 64px; }
   header {
-    background: var(--glass-bg-strong);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--ink);
     border-radius: var(--radius-lg);
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--shadow);
     position: sticky; top: 16px; z-index: 20;
     margin-bottom: 22px;
   }
@@ -82,95 +56,84 @@
   .brand { display: flex; align-items: center; gap: 12px; min-width: 0; flex-shrink: 0; }
   .nav-tabs {
     display: flex; gap: 3px; flex: 1; justify-content: center;
-    background: rgba(255,255,255,.4); padding: 4px; border-radius: 999px;
-    border: 1px solid var(--glass-border-soft);
-    box-shadow: 0 2px 6px rgba(0,0,0,.05) inset;
+    background: rgba(255,255,255,.07); padding: 4px; border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,.10);
     max-width: 380px; margin: 0 auto;
   }
   .tab {
     flex: 1; justify-content: center;
-    padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: var(--muted);
-    border-radius: 999px; border: none; background: transparent; box-shadow: none;
-    backdrop-filter: none; -webkit-backdrop-filter: none;
+    padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: rgba(243,241,234,.55);
+    border-radius: var(--radius-sm); border: none; background: transparent; box-shadow: none;
   }
-  .tab:hover { background: rgba(255,255,255,.6); color: var(--text); transform: none; border: none; }
+  .tab:hover { background: rgba(255,255,255,.08); color: var(--paper); transform: none; border: none; }
   .tab.active {
-    background: linear-gradient(160deg, #2b8fff, var(--blue)); color: #fff;
-    box-shadow: 0 3px 10px rgba(0,102,204,.35);
+    background: var(--paper); color: var(--ink);
+    box-shadow: none;
   }
   .tab svg { width: 13px; height: 13px; opacity: .9; }
   .header-mark {
-    flex-shrink: 0; width: 34px; height: 34px; border-radius: 9px;
-    background: linear-gradient(160deg, #2b8fff, var(--blue));
-    box-shadow: 0 3px 10px rgba(0,102,204,.35);
+    flex-shrink: 0; height: 34px; width: auto; max-width: 160px;
     display: flex; align-items: center; justify-content: center;
   }
-  .header-mark svg { width: 18px; height: 18px; }
+  .header-mark img { height: 100%; width: auto; max-width: 160px; object-fit: contain; display: block; }
   .brand-text { min-width: 0; }
   header h1 {
-    margin: 0; font-size: 15.5px; font-weight: 700; letter-spacing: -0.005em; color: var(--text);
+    margin: 0; font-size: 15.5px; font-weight: 700; letter-spacing: -0.005em; color: var(--paper);
     line-height: 1.3; white-space: nowrap;
   }
-  .brand-sub { margin: 1px 0 0; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .brand-sub { margin: 1px 0 0; font-size: 12px; color: rgba(243,241,234,.55); white-space: nowrap; }
 
   main { display: block; }
+
+  /* ---------- Header buttons (dark context) ---------- */
+  .header-inner .btn-ghost {
+    background: transparent; color: var(--paper); border-color: rgba(243,241,234,.22);
+  }
+  .header-inner .btn-ghost:hover { background: rgba(255,255,255,.09); border-color: rgba(243,241,234,.35); transform: none; }
 
   /* ---------- Metodología modal ---------- */
   .modal-backdrop {
     display: none; position: fixed; inset: 0; z-index: 100;
-    background: rgba(10, 20, 40, .42);
-    backdrop-filter: blur(6px);
+    background: rgba(20, 26, 22, .55);
     align-items: flex-start; justify-content: center;
     padding: 48px 20px; overflow-y: auto;
   }
   .modal-backdrop.open { display: flex; }
   .modal-card {
-    background: var(--glass-bg-strong);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    width: 100%; max-width: 860px; border-radius: var(--radius-lg);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow); margin-bottom: 40px; overflow: hidden;
+    background: var(--panel);
+    width: 100%; max-width: 1080px; border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow); margin-bottom: 40px; overflow: hidden;
   }
   .modal-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 22px; border-bottom: 1px solid var(--line);
-    position: sticky; top: 0; background: var(--glass-bg-strong); z-index: 1;
+    position: sticky; top: 0; background: var(--panel); z-index: 1;
   }
-  .modal-head h2 { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--text); }
+  .modal-head h2 { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--ink); }
   .modal-close {
-    width: 30px; height: 30px; border-radius: var(--radius-sm); border: 1px solid var(--glass-border-soft);
-    background: rgba(255,255,255,.6);
+    width: 30px; height: 30px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+    background: var(--panel);
     display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted);
     padding: 0;
   }
   .modal-close svg { width: 14px; height: 14px; }
-  .modal-close:hover { background: #fff; color: var(--text); }
-  .modal-body { padding: 6px 22px 26px; max-height: 74vh; overflow-y: auto; }
+  .modal-close:hover { background: var(--paper); color: var(--ink); }
+  .modal-body { padding: 6px 22px 26px; max-height: 74vh; overflow-y: auto; overflow-x: hidden; }
 
-  /* ---------- Panels (glass cards) ---------- */
+  /* ---------- Panels ---------- */
   .panel {
-    background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
-    padding: 22px 24px; box-shadow: var(--glass-shadow-sm);
+    background: var(--panel);
+    border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 22px 24px; box-shadow: var(--shadow-sm);
   }
-  .panel h2 { font-size: 15px; margin: 0 0 4px; font-weight: 650; letter-spacing: -.005em; }
+  .panel h2 { font-size: 14px; margin: 0 0 4px; font-weight: 700; letter-spacing: .02em; color: var(--ink); }
   .panel .sub { font-size: 12.5px; color: var(--muted); margin: 0 0 18px; line-height: 1.55; max-width: 74ch; }
 
   /* ---------- Step sequence (panels 1–5) ---------- */
   .tab-page { display: none; }
   .tab-page.active { display: flex; flex-direction: column; }
-  .step { display: flex; gap: 18px; align-items: stretch; }
-  .step-rail { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 30px; }
-  .step-num {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: linear-gradient(160deg, #2b8fff, var(--blue)); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12.5px;
-    flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,102,204,.35), 0 0 0 4px rgba(255,255,255,.5);
-  }
-  .step-line { flex: 1; width: 2px; background: rgba(20,30,50,.14); margin: 2px 0; min-height: 18px; }
-  .step:last-child .step-line { display: none; }
-  .step-body { flex: 1; min-width: 0; padding-bottom: 22px; }
+  .step-body { padding-bottom: 18px; }
   .step:last-child .step-body { padding-bottom: 0; }
 
   /* ---------- Two-column tables (Desagregación) ---------- */
@@ -182,22 +145,20 @@
   .row-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   button, .btn-ghost {
     font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
-    border-radius: 999px; padding: 9px 16px; border: 1px solid var(--glass-border-soft);
+    border-radius: var(--radius-sm); padding: 9px 16px; border: 1px solid var(--line);
     display: inline-flex; align-items: center; gap: 7px;
-    transition: background .12s ease, border-color .12s ease, transform .05s ease, box-shadow .12s ease;
-    background: rgba(255,255,255,.55);
-    backdrop-filter: blur(10px) saturate(1.4); -webkit-backdrop-filter: blur(10px) saturate(1.4);
-    color: var(--text);
-    box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 1px 0 rgba(255,255,255,.6) inset;
+    transition: background .12s ease, border-color .12s ease, transform .05s ease;
+    background: var(--panel);
+    color: var(--ink);
+    box-shadow: var(--shadow-sm);
   }
-  button:active { transform: translateY(1px) scale(.99); }
+  button:active { transform: translateY(1px); }
   .btn-primary {
-    background: linear-gradient(160deg, #2b8fff, var(--blue));
-    color: #fff; border-color: rgba(255,255,255,.5);
-    box-shadow: 0 4px 14px rgba(0,102,204,.38), 0 1px 0 rgba(255,255,255,.4) inset;
+    background: var(--moss);
+    color: #fff; border-color: var(--moss);
   }
-  .btn-primary:hover { background: linear-gradient(160deg, #4aa0ff, #0072e0); }
-  .btn-ghost:hover { border-color: var(--blue-mid); background: rgba(255,255,255,.85); transform: translateY(-1px); }
+  .btn-primary:hover { background: var(--moss-dark); }
+  .btn-ghost:hover { border-color: var(--moss); background: var(--moss-soft); transform: none; }
   .btn-ghost svg, .btn-primary svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .9; }
   input[type=file] { font-size: 12px; color: var(--muted); max-width: 210px; }
   .file-name { font-size: 12.5px; color: var(--muted); }
@@ -205,43 +166,44 @@
   /* ---------- Tables ---------- */
   table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
   thead th {
-    text-align: left; font-weight: 650; color: #2a3446; background: rgba(232,242,255,.85);
-    backdrop-filter: blur(6px);
-    padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap;
+    text-align: left; font-weight: 700; color: var(--ink); background: var(--paper);
+    padding: 9px 10px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line-soft); white-space: nowrap;
     position: sticky; top: 0;
   }
+  thead th:last-child { border-right: none; }
   thead th:nth-child(n+9) { text-align: right; }
-  tbody td { padding: 7px 10px; border-bottom: 1px solid var(--line-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  tbody tr:nth-child(even) { background: rgba(255,255,255,.4); }
-  tbody tr:hover { background: rgba(232,242,255,.55); }
+  tbody td { padding: 7px 10px; border-bottom: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  tbody td:last-child { border-right: none; }
+  tbody tr:nth-child(even) { background: rgba(27,36,32,.025); }
+  tbody tr:hover { background: var(--moss-soft); }
   #tblFlotaBody td:nth-child(n+10):not(:last-child),
   #tblCombustibleBody td:nth-child(n+2),
   #tblAntiguedadBody td:nth-child(n+2),
   #tblCategoriaBody td:nth-child(n+2),
   #tblValorBody td:nth-child(n+2) { text-align: right; }
   .tbl-wrap {
-    max-height: 460px; overflow: auto; border: 1px solid var(--glass-border-soft); border-radius: var(--radius);
-    background: rgba(255,255,255,.5);
+    max-height: 460px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--panel);
   }
 
   td input, td select {
     font: inherit; font-size: 12.5px; padding: 4px 6px; border: 1px solid var(--line);
-    border-radius: 6px; width: 100%; background: rgba(255,255,255,.8);
+    border-radius: 5px; width: 100%; background: var(--panel);
   }
-  td input:focus, td select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,102,204,.15); }
+  td input:focus, td select:focus { outline: none; border-color: var(--moss); box-shadow: 0 0 0 3px var(--moss-soft); }
 
   .pill {
-    display: inline-block; font-size: 11px; font-weight: 650; padding: 3px 9px;
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px;
     border-radius: 999px; letter-spacing: .01em;
   }
-  .pill-ok { background: rgba(47,125,95,.14); color: var(--green); }
-  .pill-warn { background: rgba(184,117,46,.14); color: var(--amber); }
-  .pill-bad { background: rgba(192,57,43,.14); color: var(--red-soft); }
+  .pill-ok { background: var(--moss-soft); color: var(--moss-dark); }
+  .pill-warn { background: var(--amber-soft); color: var(--amber); }
+  .pill-bad { background: var(--red-soft-bg); color: var(--red-soft); }
 
   /* ---------- KPI clusters ---------- */
   .kpi-cluster + .kpi-cluster { margin-top: 16px; }
   .kpi-cluster-label {
-    font-size: 12px; font-weight: 650; color: var(--text); margin: 0 0 8px;
+    font-size: 12px; font-weight: 700; color: var(--ink); margin: 0 0 8px;
     display: flex; align-items: center; gap: 7px;
   }
   .kpi-cluster-label .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -249,13 +211,13 @@
   .kpi-cluster.local .dot { background: var(--amber); }
   .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .kpi {
-    border: 1px solid var(--glass-border-soft); border-left: 3px solid var(--line); border-radius: var(--radius-sm);
-    padding: 13px 14px; background: rgba(255,255,255,.5); backdrop-filter: blur(8px);
+    border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: var(--radius-sm);
+    padding: 13px 14px; background: var(--panel);
   }
   .kpi-cluster.gei .kpi { border-left-color: var(--moss); }
   .kpi-cluster.local .kpi { border-left-color: var(--amber); }
   .kpi .label { font-size: 11px; color: var(--muted); font-weight: 600; }
-  .kpi .value { font-size: 20px; font-weight: 700; color: var(--blue-dark); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value { font-size: 21px; font-weight: 700; color: var(--ink); margin-top: 4px; font-variant-numeric: tabular-nums; }
   .kpi .unit { font-size: 11px; color: var(--muted); }
 
   .foot-note {
@@ -264,7 +226,7 @@
   }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
 
-  @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } .step { gap: 12px; } }
+  @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 640px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     .page-wrap { padding: 12px 12px 48px; }
@@ -274,23 +236,23 @@
     .nav-tabs { order: 3; width: 100%; max-width: none; margin: 4px 0 0; }
   }
 
-  .meto-body h3 { font-size: 13.5px; color: var(--blue-dark); margin: 22px 0 6px; font-weight: 650; }
+  .meto-body h3 { font-size: 13.5px; color: var(--moss-dark); margin: 22px 0 6px; font-weight: 700; }
   .meto-body h3:first-child { margin-top: 4px; }
-  .meto-body p { font-size: 13px; line-height: 1.65; color: #333; margin: 0 0 10px; }
-  .meto-body ul { margin: 0 0 10px; padding-left: 20px; font-size: 13px; line-height: 1.7; color: #333; }
+  .meto-body p { font-size: 13px; line-height: 1.65; color: #2A322D; margin: 0 0 10px; }
+  .meto-body ul { margin: 0 0 10px; padding-left: 20px; font-size: 13px; line-height: 1.7; color: #2A322D; }
   .fuente-list li { margin-bottom: 6px; }
   .formula-box {
-    background: rgba(232,242,255,.55); border: 1px solid var(--glass-border-soft); border-left: 3px solid var(--blue);
+    background: var(--moss-soft); border: 1px solid var(--line); border-left: 3px solid var(--moss);
     border-radius: var(--radius-sm); padding: 14px 16px; font-size: 13.5px; margin: 8px 0 14px; line-height: 1.9;
   }
-  .formula-box .f-main { font-weight: 650; color: var(--blue-dark); font-variant-numeric: tabular-nums; }
-  table.meto-tbl { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-bottom: 14px; }
-  table.meto-tbl th, table.meto-tbl td { border: 1px solid var(--line); padding: 6px 9px; text-align: left; vertical-align: top; }
-  table.meto-tbl th { background: rgba(232,242,255,.7); font-weight: 650; }
+  .formula-box .f-main { font-weight: 700; color: var(--moss-dark); font-variant-numeric: tabular-nums; }
+  table.meto-tbl { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 12.5px; margin-bottom: 14px; }
+  table.meto-tbl th, table.meto-tbl td { border: 1px solid var(--line); padding: 6px 9px; text-align: left; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
+  table.meto-tbl th { background: var(--paper); font-weight: 700; }
   .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
   .tag {
-    font-size: 11.5px; font-weight: 650; background: var(--blue-lt); color: var(--blue-dark);
-    border: 1px solid rgba(0,102,204,.15); border-radius: 999px; padding: 4px 11px;
+    font-size: 11.5px; font-weight: 700; background: var(--moss-soft); color: var(--moss-dark);
+    border: 1px solid rgba(47,107,79,.2); border-radius: 999px; padding: 4px 11px;
   }
 </style>
 </head>
@@ -300,21 +262,21 @@
   <div class="header-inner">
     <div class="brand">
       <div class="header-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M6 19V9l4-3 4 3v10"/><path d="M14 19v-6l4-2v8"/></svg>
+        <img src="logo-promovilidad.png" alt="PROMOVILIDAD">
       </div>
       <div class="brand-text">
-        <h1>Emisiones · Transporte Público</h1>
-        <p class="brand-sub">Estimación de GEI y contaminantes locales del parque vehicular</p>
+        <h1>EMISIONES · TRANSPORTE PÚBLICO</h1>
+        <p class="brand-sub">Estimación de GEI y contaminantes locales</p>
       </div>
     </div>
     <div class="nav-tabs">
       <button class="tab active" data-tab="datos" onclick="switchTab('datos')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
-        1–2 · Datos
+        Datos
       </button>
       <button class="tab" data-tab="resultados" onclick="switchTab('resultados')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h4V10H4z"/><path d="M10 19h4V5h-4z"/><path d="M16 19h4v-7h-4z"/></svg>
-        3–5 · Resultados
+        Resultados
       </button>
     </div>
     <button class="btn-ghost" id="metoToggle">
@@ -329,26 +291,18 @@
   <div class="modal-backdrop" id="metoPanel">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>Metodología y criterios aplicados</h2>
+        <h2>METODOLOGÍA Y CRITERIOS APLICADOS</h2>
         <button class="modal-close" id="metoClose" aria-label="Cerrar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
       </div>
       <div class="modal-body meto-body">
 
-    <div class="tag-row">
-      <span class="tag">Directiva N° 002-2006-MTC/15</span>
-      <span class="tag">Metodología de Cálculo de Emisiones Evitadas (Chatarreo, MTC)</span>
-      <span class="tag">Propuesta Metodológica de Estimación — PROMOVILIDAD</span>
-      <span class="tag">Directrices IPCC 2006 (comparabilidad)</span>
-    </div>
-
     <h3>Fuentes normativas y metodológicas</h3>
     <ul class="fuente-list">
       <li><strong>Clasificación vehicular:</strong> Directiva N° 002-2006-MTC/15 "Clasificación Vehicular y Estandarización de Características Registrables Vehiculares" — define las categorías L, M1, M2, M3, N1, N2, N3.</li>
       <li><strong>Factores de emisión:</strong> Metodología para el Cálculo de Emisiones Evitadas y Valoración de Externalidades Ambientales Mitigadas (Programas de Chatarreo), Dirección de Políticas y Normas en Transporte Sostenible, MTC — misma tabla oficial usada en la Herramienta PCH Módulo B.</li>
-      <li><strong>Procedimiento de estimación para transporte urbano:</strong> Propuesta Metodológica de Estimación de Emisiones del Transporte Urbano, PROMOVILIDAD, que adapta el uso de estos factores a información de actividad vehicular real (rutas) en vez de promedios genéricos.</li>
-      <li><strong>Comparabilidad internacional:</strong> los resultados pueden agregarse conforme a las Directrices del IPCC 2006, sin alterar el cálculo base.</li>
+      <li><strong>Procedimiento de estimación para transporte urbano:</strong> Propuesta Metodológica de Estimación de Emisiones del Transporte Urbano, PROMOVILIDAD, adapta el uso de estos factores a información de actividad vehicular real (rutas) en vez de promedios genéricos.</li>
     </ul>
 
     <h3>Contaminantes estimados</h3>
@@ -357,17 +311,17 @@
     <h3>Datos de entrada por vehículo</h3>
     <table class="meto-tbl">
       <tr><th>Dato</th><th>Origen</th><th>Uso en el cálculo</th></tr>
-      <tr><td>Categoría vehicular</td><td>Reporte de la autoridad de transporte local</td><td>Define el tipo tecnológico (j) — junto con combustible y año arma el código de búsqueda del factor de emisión</td></tr>
-      <tr><td>Año de fabricación</td><td>Reporte de la autoridad de transporte local</td><td>Ubica el vehículo en el rango de antigüedad que usa la tabla de factores (antes de 2000 / 2000-2002 / 2003-2006 / 2007-2017 / 2018 o posterior)</td></tr>
-      <tr><td>Tipo de combustible</td><td>Reporte de la autoridad de transporte local (frecuentemente ausente)</td><td>Define la tecnología (f) — sin este dato no se puede ubicar el factor de emisión correspondiente</td></tr>
-      <tr><td>Distancia de ruta autorizada [km]</td><td>Expediente de ruta / autoridad local</td><td>Componente del Recorrido Promedio (RP) anual</td></tr>
-      <tr><td>Viajes o circuitos por día</td><td>Completado por el analista (conteo u operador)</td><td>Componente del RP anual</td></tr>
-      <tr><td>Días de operación al año</td><td>Completado por el analista (365 por defecto, editable)</td><td>Componente del RP anual</td></tr>
+      <tr><td>Categoría vehicular</td><td>Reporte del gobierno local</td><td>Define el tipo tecnológico (j): junto con combustible y año arma el código de búsqueda del factor de emisión</td></tr>
+      <tr><td>Año de fabricación</td><td>Reporte del gobierno local</td><td>Ubica el vehículo en el rango de antigüedad que usa la tabla de factores</td></tr>
+      <tr><td>Tipo de combustible</td><td>Reporte del gobierno local</td><td>Define la tecnología (f): sin este dato no se puede ubicar el factor de emisión correspondiente</td></tr>
+      <tr><td>Distancia de ruta autorizada [km]</td><td>Expediente de ruta / gobierno local</td><td>Componente del Recorrido Promedio (RP) anual</td></tr>
+      <tr><td>Viajes, vueltas o circuitos por día</td><td>Reporte del gobierno local</td><td>Componente del RP anual</td></tr>
+      <tr><td>Días de operación al año</td><td>365 por defecto, editable</td><td>Componente del RP anual</td></tr>
     </table>
 
     <h3>Fórmulas aplicadas</h3>
     <div class="formula-box">
-      <div class="f-main">RP = Distancia de ruta autorizada [km] × Viajes/circuitos por día × Días de operación al año</div>
+      <div class="f-main">RP = Distancia de ruta autorizada [km] × Viajes/vueltas por día × Días de operación al año</div>
       <div style="color:var(--muted); font-size:12.5px;">Recorrido Promedio anual del vehículo [km/año]. Reemplaza el uso de un promedio nacional genérico cuando se cuenta con información real de la ruta.</div>
     </div>
     <div class="formula-box">
@@ -375,7 +329,8 @@
       <div style="color:var(--muted); font-size:12.5px;">Emisión anual del vehículo tipo i, categoría j, para el contaminante k, en toneladas/año. FE en g/km, RP en km/año, 10⁻⁶ convierte gramos a toneladas.</div>
     </div>
     <div class="formula-box">
-      <div class="f-main">EEⱼₖ = Σ EEᵢⱼₖ &nbsp;&nbsp;·&nbsp;&nbsp; EETₖ = Σⱼ EEⱼₖ</div>
+      <div class="f-main">EEⱼₖ = Σ EEᵢⱼₖ</div>
+      <div class="f-main">EETₖ = Σⱼ EEⱼₖ</div>
       <div style="color:var(--muted); font-size:12.5px;">Las emisiones individuales se agregan primero por categoría vehicular y luego se suman entre categorías, para obtener el total del contaminante k en la ciudad o ámbito analizado (lo que muestra el resumen agregado de la app).</div>
     </div>
 
@@ -419,10 +374,10 @@
     </ul>
 
     <h3>Nota sobre agrupación por antigüedad</h3>
-    <p>La búsqueda del factor de emisión usa los rangos de año de fabricación de la tabla oficial (antes de 2000, 2000-2002, 2003-2006, 2007-2017, 2018 o posterior). Para la <em>presentación</em> de resultados desagregados, la Propuesta Metodológica sugiere adicionalmente agrupar por antigüedad en bandas de 0-4, 5-9, 10-14 y 15+ años — son dos agrupaciones con fines distintos (cálculo vs. reporte) y no deben confundirse.</p>
-
+    <p>La búsqueda del factor de emisión usa los rangos de año de fabricación de la tabla oficial (antes de 2000, 2000-2002, 2003-2006, 2007-2017, 2018 o posterior).</p>
+    <p>Para la presentación de resultados desagregados, la Propuesta Metodológica sugiere adicionalmente agrupar por antigüedad en bandas de 0-4, 5-9, 10-14 y 15+ años.</p>
     <h3>Valorización económica (externalidad negativa)</h3>
-    <p>Las toneladas/año calculadas con el RP real de cada vehículo se convierten a un valor monetario aplicando el costo social por contaminante, tomado de la misma Herramienta PCH del MTC (hoja Param.1_DistanciaYCosto Social, fila 24):</p>
+    <p>Las toneladas/año calculadas con el RP real de cada vehículo se convierten a un valor monetario aplicando el costo social por contaminante, tomado de la misma Herramienta PCH del MTC:</p>
     <table class="meto-tbl">
       <tr><th>Contaminante</th><th>Costo social [US$/tonelada]</th><th>Fuente</th></tr>
       <tr><td>CO₂</td><td>36.00</td><td>Pica-Téllez, Dittborn, Cid &amp; Frenette (2024) — precio social del carbono para Perú</td></tr>
@@ -434,7 +389,7 @@
     </table>
     <div class="formula-box">
       <div class="f-main">Externalidad [US$/año] = Emisión [t/año] × Costo social [US$/tonelada]</div>
-      <div style="color:var(--muted); font-size:12.5px;">Se aplica sobre la emisión ya calculada con la distancia de ruta real (no sobre la tabla de "Externalidad Negativa" del Excel original, que usa la distancia genérica nacional y no es consistente con el enfoque de este módulo).</div>
+      <div style="color:var(--muted); font-size:12.5px;">Se aplica sobre la emisión ya calculada con la distancia de ruta real.</div>
     </div>
 
       </div>
@@ -443,13 +398,10 @@
 
   <div class="steps tab-page active" id="tab-datos">
   <div class="step">
-    <div class="step-rail"><div class="step-num">1</div><div class="step-line"></div></div>
     <div class="step-body">
   <div class="panel">
-    <h2>Cargar datos</h2>
-    <p class="sub">Importa el Excel remitido por la empresa de transporte / gobierno local. Columnas esperadas:
-    Empresa, Placa, Categoría, Año Modelo, Combustible, Ruta, Distancia_ruta_km. Las columnas Viajes_dia y
-    Dias_operacion_anio se pueden completar dentro de la tabla.</p>
+    <h2>CARGAR DATOS</h2>
+    <p class="sub">Importa el Excel de flota remitido por el gobierno local.</p>
     <div class="row-actions">
       <label class="btn-ghost" for="fileInput">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
@@ -457,7 +409,7 @@
         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;">
       </label>
       <span class="file-name" id="fileNameLabel">Ningún archivo seleccionado</span>
-      <button class="btn-ghost" id="btnPlantilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>Descargar plantilla vacía</button>
+      <button class="btn-ghost" id="btnPlantilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>Descargar plantilla</button>
       <button class="btn-ghost" id="btnAgregarFila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Agregar fila manual</button>
       <button class="btn-primary" id="btnCalcular"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h2"/><path d="M14 12h2"/><path d="M8 16h2"/><path d="M14 16h2"/></svg>Calcular emisiones</button>
       <button class="btn-ghost" id="btnExportar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>Exportar resultados (Excel)</button>
@@ -473,23 +425,21 @@
   </div>
 
   <div class="step">
-    <div class="step-rail"><div class="step-num">2</div><div class="step-line"></div></div>
     <div class="step-body">
   <div class="panel">
-    <h2>Flota</h2>
-    <p class="sub">Placa, categoría, año y combustible vienen del reporte. Vueltas/día y días de operación se
-    completan aquí; días de operación viene con 365 por defecto y es editable por vehículo.</p>
+    <h2>FLOTA PARA EVALUAR</h2>
+    <p class="sub">Todos los datos vienen del reporte, pero también es editable dentro de la app.</p>
     <div class="tbl-wrap">
       <table id="tblFlota">
         <thead>
           <tr>
             <th>Empresa</th><th>Ruta</th><th>Placa</th><th>Categoría</th><th>Año</th><th>Combustible</th>
             <th>Dist. ruta (km)</th><th>Viajes/día</th><th>Días op./año</th>
-            <th>CO₂ (t/año)</th><th>PM2.5 (kg/año)</th><th>NOₓ (kg/año)</th><th>Estado</th>
+            <th>CO₂ (t/año)</th><th>CH₄ (kg/año)</th><th>N₂O (kg/año)</th><th>PM2.5 (kg/año)</th><th>NOₓ (kg/año)</th><th>SO₂ (kg/año)</th><th>Estado</th>
           </tr>
         </thead>
         <tbody id="tblFlotaBody">
-          <tr><td colspan="13"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>
+          <tr><td colspan="16"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>
         </tbody>
       </table>
     </div>
@@ -501,10 +451,9 @@
 
   <div class="steps tab-page" id="tab-resultados">
   <div class="step">
-    <div class="step-rail"><div class="step-num">3</div><div class="step-line"></div></div>
     <div class="step-body">
   <div class="panel">
-    <h2>Resumen agregado</h2>
+    <h2>RESUMEN DE EMISIONES</h2>
     <p class="sub" id="resumenSub">Totales anuales de la flota cargada. Vehículos sin vueltas/día completadas no se incluyen en el total (aparecen como "pendiente").</p>
     <div id="kpiGrid">
       <div class="kpi-cluster gei">
@@ -535,10 +484,9 @@
   </div>
 
   <div class="step">
-    <div class="step-rail"><div class="step-num">4</div><div class="step-line"></div></div>
     <div class="step-body">
   <div class="panel">
-    <h2>Desagregación de resultados</h2>
+    <h2>DESAGREGACIÓN DE RESULTADOS</h2>
     <p class="sub" id="desagSub">Emisiones totales por tipo de combustible, antigüedad vehicular y clasificación vehicular (Ecuaciones 4 y 5), solo con los vehículos que tienen cálculo completo.</p>
 
     <div class="twocol-grid">
@@ -575,10 +523,9 @@
   </div>
 
   <div class="step">
-    <div class="step-rail"><div class="step-num">5</div><div class="step-line"></div></div>
     <div class="step-body">
   <div class="panel">
-    <h2>Valorización económica (externalidad negativa)</h2>
+    <h2>VALORIZACIÓN ECONÓMICA (EXTERNALIDAD NEGATIVA)</h2>
     <p class="sub" id="valorSub">Emisiones totales convertidas a US$/año usando el costo social por contaminante (Herramienta PCH, MTC). Se aplica sobre las toneladas/año ya calculadas con tu RP real, no sobre el promedio genérico del Excel.</p>
     <div class="tbl-wrap" style="max-height:none;">
       <table id="tblValor">
@@ -697,7 +644,7 @@ function estadoVehiculo(v) {
 function renderTabla() {
   const body = document.getElementById("tblFlotaBody");
   if (flota.length === 0) {
-    body.innerHTML = '<tr><td colspan="13"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>';
+    body.innerHTML = '<tr><td colspan="16"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>';
     return;
   }
   body.innerHTML = "";
@@ -705,20 +652,23 @@ function renderTabla() {
     calcularVehiculo(v);
     const est = estadoVehiculo(v);
     const co2 = v._emisiones ? v._emisiones.CO2.toFixed(2) : "—";
+    const ch4 = v._emisiones ? (v._emisiones.CH4*1000).toFixed(2) : "—";
+    const n2o = v._emisiones ? (v._emisiones.N2O*1000).toFixed(2) : "—";
     const pm25 = v._emisiones ? (v._emisiones["PM2.5"]*1000).toFixed(2) : "—";
     const nox = v._emisiones ? (v._emisiones.NOx*1000).toFixed(2) : "—";
+    const so2 = v._emisiones ? (v._emisiones.SO2*1000).toFixed(2) : "—";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input type="text" data-idx="${idx}" data-field="empresa" value="${v.empresa||""}" style="width:110px;"></td>
-      <td><input type="text" data-idx="${idx}" data-field="ruta" value="${v.ruta||""}" style="width:100px;"></td>
-      <td><input type="text" data-idx="${idx}" data-field="placa" value="${v.placa||""}" style="width:80px;"></td>
+      <td><input type="text" data-idx="${idx}" data-field="empresa" value="${v.empresa||""}" style="width:92px;"></td>
+      <td><input type="text" data-idx="${idx}" data-field="ruta" value="${v.ruta||""}" style="width:72px;"></td>
+      <td><input type="text" data-idx="${idx}" data-field="placa" value="${v.placa||""}" style="width:68px;"></td>
       <td>
         <select data-idx="${idx}" data-field="categoria">
           ${CATEGORIAS.map(c=>`<option value="${c}" ${v.categoria===c?"selected":""}>${c}</option>`).join("")}
         </select>
       </td>
-      <td><input type="number" data-idx="${idx}" data-field="anio_modelo" value="${v.anio_modelo||""}" style="width:64px;"></td>
+      <td><input type="number" data-idx="${idx}" data-field="anio_modelo" value="${v.anio_modelo||""}" style="width:56px;"></td>
       <td>
         <select data-idx="${idx}" data-field="combustible">
           <option value="" ${!v.combustible?"selected":""}>Sin dato</option>
@@ -726,12 +676,15 @@ function renderTabla() {
           <option value="Electrico" ${v.combustible==="Electrico"?"selected":""}>Eléctrico</option>
         </select>
       </td>
-      <td><input type="number" data-idx="${idx}" data-field="distancia_ruta_km" value="${v.distancia_ruta_km||""}" style="width:70px;"></td>
-      <td><input type="number" data-idx="${idx}" data-field="viajes_dia" value="${v.viajes_dia||""}" style="width:56px;" placeholder="—"></td>
-      <td><input type="number" data-idx="${idx}" data-field="dias_operacion_anio" value="${v.dias_operacion_anio||365}" style="width:60px;"></td>
+      <td><input type="number" data-idx="${idx}" data-field="distancia_ruta_km" value="${v.distancia_ruta_km||""}" style="width:64px;"></td>
+      <td><input type="number" data-idx="${idx}" data-field="viajes_dia" value="${v.viajes_dia||""}" style="width:52px;" placeholder="—"></td>
+      <td><input type="number" data-idx="${idx}" data-field="dias_operacion_anio" value="${v.dias_operacion_anio||365}" style="width:56px;"></td>
       <td>${co2}</td>
+      <td>${ch4}</td>
+      <td>${n2o}</td>
       <td>${pm25}</td>
       <td>${nox}</td>
+      <td>${so2}</td>
       <td><span class="pill ${est.cls}">${est.txt}</span></td>
     `;
     body.appendChild(tr);
@@ -893,7 +846,7 @@ function renderValorizacion() {
   }
 
   document.getElementById("valorSub").textContent =
-    `Calculado sobre ${incluidos} vehículo(s) con cálculo completo. Costo social por tonelada según Param.1 de la Herramienta PCH (MTC).`;
+    `Calculado sobre ${incluidos} vehículo(s) con cálculo completo. Costo social por tonelada según la Herramienta PCH (MTC).`;
 }
 
 document.getElementById("btnCalcular").addEventListener("click", () => {
