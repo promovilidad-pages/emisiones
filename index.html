@@ -1175,16 +1175,17 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
 });
 
 document.getElementById("btnExportar").addEventListener("click", () => {
+  const ETIQUETAS_EMISION = { CO2:"CO₂ (t/año)", CH4:"CH₄ (t/año)", N2O:"N₂O (t/año)", "PM2.5":"PM2.5 (t/año)", NOx:"NOₓ (t/año)", SO2:"SO₂ (t/año)" };
   const data = flota.map(v => {
     calcularVehiculo(v);
     const row = {
-      Grupo: v.grupo || "", Empresa: v.empresa, Placa: v.placa, Categoria: v.categoria, Anio_Modelo: v.anio_modelo,
-      Combustible: v.combustible, Ruta: v.ruta, Distancia_ruta_km: v.distancia_ruta_km,
-      Viajes_dia: v.viajes_dia, Dias_operacion_anio: v.dias_operacion_anio,
-      Codigo_factor: v._codigo || "", RP_km_anio: v._rp || ""
+      Grupo: v.grupo || "", Empresa: v.empresa, Placa: v.placa, "Categoría": v.categoria, "Año Modelo": v.anio_modelo,
+      Combustible: v.combustible, Ruta: v.ruta, "Distancia ruta (km)": v.distancia_ruta_km,
+      "Viajes/día": v.viajes_dia, "Días op./año": v.dias_operacion_anio,
+      "Código factor": v._codigo || "", "RP (km/año)": v._rp || ""
     };
     if (v._emisiones) {
-      for (const k of Object.keys(v._emisiones)) row["EE_" + k + "_t_anio"] = v._emisiones[k];
+      for (const k of Object.keys(v._emisiones)) row[ETIQUETAS_EMISION[k] || k] = v._emisiones[k];
     }
     row.Estado = estadoVehiculo(v).txt;
     return row;
