@@ -171,15 +171,16 @@
     position: sticky; top: 0;
   }
   thead th:last-child { border-right: none; }
-  thead th:nth-child(n+9) { text-align: right; }
+  thead th:nth-child(n+10) { text-align: right; }
   tbody td { padding: 7px 10px; border-bottom: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
   tbody td:last-child { border-right: none; }
   tbody tr:nth-child(even) { background: rgba(27,36,32,.025); }
   tbody tr:hover { background: var(--moss-soft); }
-  #tblFlotaBody td:nth-child(n+10):not(:last-child),
+  #tblFlotaBody td:nth-child(n+11):not(:last-child),
   #tblCombustibleBody td:nth-child(n+2),
   #tblAntiguedadBody td:nth-child(n+2),
   #tblCategoriaBody td:nth-child(n+2),
+  #tblGrupoBody td:nth-child(n+2),
   #tblValorBody td:nth-child(n+2) { text-align: right; }
   .tbl-wrap {
     max-height: 460px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius);
@@ -264,6 +265,20 @@
     font-size: 11.5px; font-weight: 700; background: var(--moss-soft); color: var(--moss-dark);
     border: 1px solid rgba(47,107,79,.2); border-radius: 999px; padding: 4px 11px;
   }
+
+  /* ---------- Datos de la ciudad (metadata) ---------- */
+  .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .meta-field label {
+    display: block; font-size: 11px; font-weight: 700; color: var(--muted);
+    margin-bottom: 5px; text-transform: uppercase; letter-spacing: .02em;
+  }
+  .meta-field input {
+    width: 100%; font: inherit; font-size: 13px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    background: var(--panel); color: var(--ink);
+  }
+  .meta-field input:focus { outline: none; border-color: var(--moss); box-shadow: 0 0 0 3px var(--moss-soft); }
+  @media (max-width: 640px) { .meta-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -327,7 +342,25 @@
       <tr><td>Distancia de ruta autorizada [km]</td><td>Expediente de ruta / gobierno local</td><td>Componente del Recorrido Promedio (RP) anual</td></tr>
       <tr><td>Viajes, vueltas o circuitos por día</td><td>Reporte del gobierno local</td><td>Componente del RP anual</td></tr>
       <tr><td>Días de operación al año</td><td>365 por defecto, editable</td><td>Componente del RP anual</td></tr>
+      <tr><td>Grupo (clasificación operativa)</td><td>Definido por el equipo evaluador (ej. TP, I, TPR)</td><td>No interviene en el cálculo del factor de emisión — es solo una etiqueta libre para desagregar los resultados por tipo de servicio (ver "Desagregación de resultados")</td></tr>
+      <tr><td>Empresa, Placa, Ruta</td><td>Reporte del gobierno local</td><td>Datos identificatorios del vehículo, no intervienen en el cálculo</td></tr>
     </table>
+
+    <h3>Valores válidos por campo (para evitar errores al importar)</h3>
+    <p>Estos son los únicos valores que la app reconoce en los campos con lista cerrada. Un valor distinto a estos hace que el vehículo quede marcado como <strong>"SF" (Sin factor)</strong> porque no encuentra su código en la tabla oficial.</p>
+    <table class="meto-tbl">
+      <tr><th>Campo</th><th>Valores aceptados</th><th>Notas</th></tr>
+      <tr><td>Categoría</td><td>L, M1, M2, M3, N1, N2, N3</td><td>Lista cerrada — debe coincidir exactamente (sin espacios ni minúsculas)</td></tr>
+      <tr><td>Combustible</td><td>Diesel, Gasolina, GLP, GNV, Hibrido, Electrico</td><td>Lista cerrada. "Hibrido" y "Electrico" van sin tilde</td></tr>
+      <tr><td>Grupo</td><td>Texto libre (ej. TP, I, TPR)</td><td>Sin lista cerrada — se puede escribir cualquier nomenclatura; la app la pasa a mayúsculas automáticamente</td></tr>
+      <tr><td>Placa</td><td>Texto libre</td><td>Sin restricción de formato, ej. ABC-123</td></tr>
+      <tr><td>Año Modelo</td><td>Número de 4 dígitos</td><td>Debe ser un año de fabricación real, no vacío</td></tr>
+      <tr><td>Distancia ruta (km), Viajes/día</td><td>Número mayor a 0</td><td>Sin estos dos datos el vehículo queda "P" (Pendiente) y no se proyecta a toneladas/año</td></tr>
+    </table>
+    <p>La plantilla descargable ("Descargar plantilla") ya trae una fila de ejemplo con valores válidos (Placa, Categoría y Combustible) y una segunda pestaña "Valores válidos" con esta misma lista — se puede borrar esa pestaña antes de devolver el archivo, la app solo lee la primera hoja del Excel sin importar cómo se llame, siempre que quede primera en el orden de pestañas.</p>
+
+    <h3>Datos de la ciudad (metadatos del archivo)</h3>
+    <p>Antes de la tabla de flota, tanto la plantilla como el Excel exportado incluyen 4 filas de datos de referencia del archivo: <strong>Ciudad, Ubigeo, Fuente</strong> (ej. MPP, GIZ) y <strong>Fecha de actualización</strong>. Se llenan en el panel "Datos de la ciudad" de la app y no intervienen en ningún cálculo — sirven para identificar de qué ciudad y de qué fuente proviene cada archivo, a modo de ficha o base de datos por ciudad. Al importar un Excel que ya tiene estas filas llenas, la app las reconoce automáticamente y llena ese panel; también se guardan al exportar la sesión en JSON.</p>
 
     <h3>Fórmulas aplicadas</h3>
     <div class="formula-box">
@@ -492,14 +525,16 @@
 
     <h3>Casos especiales</h3>
     <ul>
-      <li><strong>Vehículos eléctricos:</strong> no tienen factor en la tabla oficial del MTC (no aplica emisión directa de tubo de escape); la app los marca con 0 emisiones directas en vez de intentar buscarlos en la tabla.</li>
-      <li><strong>Combustible sin dato:</strong> el vehículo queda marcado como "Sin factor" y no entra a la sumatoria total hasta que se complete, para no introducir un supuesto no verificado en el resultado agregado.</li>
-      <li><strong>Sin vueltas/día:</strong> el vehículo queda "Pendiente" — se puede calcular su factor de emisión en g/km, pero no se proyecta a toneladas/año hasta tener el dato de actividad real.</li>
+      <li><strong>Vehículos eléctricos — Estado "E":</strong> no tienen factor en la tabla oficial del MTC (no aplica emisión directa de tubo de escape); la app los marca con 0 emisiones directas en vez de intentar buscarlos en la tabla.</li>
+      <li><strong>Combustible sin dato o valor no reconocido — Estado "SF" (Sin factor):</strong> el vehículo queda marcado así y no entra a la sumatoria total hasta que se corrija con uno de los valores válidos de Categoría/Combustible, para no introducir un supuesto no verificado en el resultado agregado.</li>
+      <li><strong>Sin vueltas/día o distancia de ruta — Estado "P" (Pendiente):</strong> se puede calcular su factor de emisión en g/km, pero no se proyecta a toneladas/año hasta tener el dato de actividad real.</li>
+      <li><strong>Estado "C" (Calculado):</strong> el vehículo tiene todos los datos necesarios y su emisión anual ya está en la sumatoria de resultados.</li>
     </ul>
 
     <h3>Nota sobre agrupación por antigüedad</h3>
     <p>La búsqueda del factor de emisión usa los rangos de año de fabricación de la tabla oficial (antes de 2000, 2000-2002, 2003-2006, 2007-2017, 2018 o posterior).</p>
     <p>Para la presentación de resultados desagregados, la Propuesta Metodológica sugiere adicionalmente agrupar por antigüedad en bandas de 0-4, 5-9, 10-14 y 15+ años.</p>
+    <p>Además de combustible, antigüedad y categoría vehicular, la app arma una cuarta desagregación <strong>por Grupo</strong>: suma las emisiones de los vehículos que comparten la misma etiqueta escrita en el campo "Grupo" (ej. TP, I, TPR). No corresponde a una ecuación de la metodología oficial — es una vista adicional para separar resultados por tipo de servicio, según la clasificación que defina cada evaluación. Los vehículos sin grupo asignado se agrupan como "Sin clasificar".</p>
     <h3>Valorización económica (externalidad negativa)</h3>
     <p>Las toneladas/año calculadas con el RP real de cada vehículo se convierten a un valor monetario aplicando el costo social por contaminante, tomado de la misma Herramienta PCH del MTC:</p>
     <table class="meto-tbl">
@@ -551,19 +586,46 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
+    <h2>DATOS DE LA CIUDAD</h2>
+    <p class="sub">Datos de referencia de esta evaluación. Se guardan junto con la flota al exportar o descargar la plantilla, y quedan disponibles como base de datos por ciudad.</p>
+    <div class="meta-grid">
+      <div class="meta-field">
+        <label for="metaCiudad">Ciudad</label>
+        <input type="text" id="metaCiudad" placeholder="Ej. Trujillo">
+      </div>
+      <div class="meta-field">
+        <label for="metaUbigeo">Ubigeo</label>
+        <input type="text" id="metaUbigeo" placeholder="Ej. 130101">
+      </div>
+      <div class="meta-field">
+        <label for="metaFuente">Fuente</label>
+        <input type="text" id="metaFuente" placeholder="Ej. MPP, GIZ">
+      </div>
+      <div class="meta-field">
+        <label for="metaFecha">Fecha de actualización</label>
+        <input type="date" id="metaFecha">
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-body">
+  <div class="panel">
     <h2>FLOTA PARA EVALUAR</h2>
     <p class="sub">Todos los datos vienen del reporte, pero también es editable dentro de la app.</p>
     <div class="tbl-wrap">
       <table id="tblFlota">
         <thead>
           <tr>
-            <th>Empresa</th><th>Ruta</th><th>Placa</th><th>Categoría</th><th>Año</th><th>Combustible</th>
+            <th>Grupo</th><th>Empresa</th><th>Ruta</th><th>Placa</th><th>Categoría</th><th>Año</th><th>Combustible</th>
             <th>Dist. ruta (km)</th><th>Viajes/día</th><th>Días op./año</th>
             <th>CO₂ (t/año)</th><th>CH₄ (kg/año)</th><th>N₂O (kg/año)</th><th>PM2.5 (kg/año)</th><th>NOₓ (kg/año)</th><th>SO₂ (kg/año)</th><th>Estado</th>
           </tr>
         </thead>
         <tbody id="tblFlotaBody">
-          <tr><td colspan="16"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>
+          <tr><td colspan="17"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>
         </tbody>
       </table>
     </div>
@@ -641,6 +703,15 @@
           </table>
         </div>
       </div>
+      <div>
+        <h3 style="font-size:13px; margin:0 0 8px; color:var(--navy);">Por grupo (clasificación TP / I / TPR, etc.)</h3>
+        <div class="tbl-wrap" style="max-height:none;">
+          <table id="tblGrupo">
+            <thead><tr><th>Grupo</th><th>N° veh.</th><th>CO₂ (t/año)</th><th>CH₄ (kg/año)</th><th>N₂O (kg/año)</th><th>PM2.5 (kg/año)</th><th>NOₓ (kg/año)</th><th>SO₂ (kg/año)</th></tr></thead>
+            <tbody id="tblGrupoBody"><tr><td colspan="8" style="text-align:center; color:var(--muted);">Sin datos aún</td></tr></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
     </div>
@@ -687,6 +758,21 @@ const COMB_ABBR = { "Diesel":"Die", "Gasolina":"Gas", "GLP":"GLP", "GNV":"GNV", 
 const CATEGORIAS = ["L","M1","M2","M3","N1","N2","N3"];
 
 let flota = [];
+let metadata = { ciudad:"", ubigeo:"", fuente:"", fecha_actualizacion:"" };
+
+function renderMetadata() {
+  document.getElementById("metaCiudad").value = metadata.ciudad || "";
+  document.getElementById("metaUbigeo").value = metadata.ubigeo || "";
+  document.getElementById("metaFuente").value = metadata.fuente || "";
+  document.getElementById("metaFecha").value = metadata.fecha_actualizacion || "";
+}
+
+["metaCiudad","metaUbigeo","metaFuente","metaFecha"].forEach(id => {
+  document.getElementById(id).addEventListener("input", (e) => {
+    const map = { metaCiudad:"ciudad", metaUbigeo:"ubigeo", metaFuente:"fuente", metaFecha:"fecha_actualizacion" };
+    metadata[map[id]] = e.target.value;
+  });
+});
 
 function anioBucket(categoria, anio) {
   if (categoria === "L") {
@@ -759,16 +845,16 @@ function calcularVehiculo(v) {
 }
 
 function estadoVehiculo(v) {
-  if (v._electrico) return { cls:"pill-ok", txt:"Eléctrico (0 directo)" };
-  if (v._sinFactor) return { cls:"pill-bad", txt:"Sin factor (revisar combustible/año)" };
-  if (!v._rp) return { cls:"pill-warn", txt:"Pendiente (falta viajes/día)" };
-  return { cls:"pill-ok", txt:"Calculado" };
+  if (v._electrico) return { cls:"pill-ok", code:"E", txt:"Eléctrico (0 directo)" };
+  if (v._sinFactor) return { cls:"pill-bad", code:"SF", txt:"Sin factor (revisar combustible/año)" };
+  if (!v._rp) return { cls:"pill-warn", code:"P", txt:"Pendiente (falta viajes/día)" };
+  return { cls:"pill-ok", code:"C", txt:"Calculado" };
 }
 
 function renderTabla() {
   const body = document.getElementById("tblFlotaBody");
   if (flota.length === 0) {
-    body.innerHTML = '<tr><td colspan="16"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>';
+    body.innerHTML = '<tr><td colspan="17"><div class="empty-state">Aún no hay datos cargados. Importa un Excel o agrega filas manualmente.</div></td></tr>';
     return;
   }
   body.innerHTML = "";
@@ -784,6 +870,7 @@ function renderTabla() {
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
+      <td><input type="text" data-idx="${idx}" data-field="grupo" value="${v.grupo||""}" style="width:46px; text-transform:uppercase;" maxlength="8" placeholder="—" title="Clasificación de grupo (ej. TP, I, TPR)"></td>
       <td><input type="text" data-idx="${idx}" data-field="empresa" value="${v.empresa||""}" style="width:92px;"></td>
       <td><input type="text" data-idx="${idx}" data-field="ruta" value="${v.ruta||""}" style="width:72px;"></td>
       <td><input type="text" data-idx="${idx}" data-field="placa" value="${v.placa||""}" style="width:68px;"></td>
@@ -809,7 +896,7 @@ function renderTabla() {
       <td>${pm25}</td>
       <td>${nox}</td>
       <td>${so2}</td>
-      <td><span class="pill ${est.cls}">${est.txt}</span></td>
+      <td><span class="pill ${est.cls}" title="${est.txt}">${est.code}</span></td>
     `;
     body.appendChild(tr);
   });
@@ -821,6 +908,8 @@ function renderTabla() {
       let val = e.target.value;
       if (["anio_modelo","distancia_ruta_km","viajes_dia","dias_operacion_anio"].includes(field)) {
         val = val === "" ? null : parseFloat(val);
+      } else if (field === "grupo") {
+        val = val.toUpperCase().trim();
       }
       flota[idx][field] = val;
       renderTabla();
@@ -876,6 +965,8 @@ function renderDesagregacion() {
   const porAntiguedad = {};
   // por clasificación vehicular (categoría)
   const porCategoria = {};
+  // por grupo (clasificación operativa: TP, I, TPR, etc.)
+  const porGrupo = {};
   const vacio = () => { const o = {n:0}; CONTAM.forEach(k => o[k]=0); return o; };
   ORDEN_BANDAS.forEach(b => porAntiguedad[b] = vacio());
   CATEGORIAS.forEach(c => porCategoria[c] = vacio());
@@ -901,6 +992,11 @@ function renderDesagregacion() {
     if (!porCategoria[cat]) porCategoria[cat] = vacio();
     porCategoria[cat].n++;
     CONTAM.forEach(k => porCategoria[cat][k] += v._emisiones[k]);
+
+    const grp = (v.grupo || "").trim().toUpperCase() || "SIN CLASIFICAR";
+    if (!porGrupo[grp]) porGrupo[grp] = vacio();
+    porGrupo[grp].n++;
+    CONTAM.forEach(k => porGrupo[grp][k] += v._emisiones[k]);
   });
 
   const fmt = (d, k) => k === "CO2" ? d.CO2.toFixed(2) : (d[k]*1000).toFixed(2);
@@ -936,8 +1032,19 @@ function renderDesagregacion() {
     }).join("");
   }
 
+  const bodyGrupo = document.getElementById("tblGrupoBody");
+  const grupoKeys = Object.keys(porGrupo);
+  if (grupoKeys.length === 0) {
+    bodyGrupo.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--muted);">Sin datos aún</td></tr>';
+  } else {
+    bodyGrupo.innerHTML = grupoKeys.map(k => {
+      const d = porGrupo[k];
+      return `<tr><td>${k}</td><td>${d.n}</td><td>${fmt(d,"CO2")}</td><td>${fmt(d,"CH4")}</td><td>${fmt(d,"N2O")}</td><td>${fmt(d,"PM2.5")}</td><td>${fmt(d,"NOx")}</td><td>${fmt(d,"SO2")}</td></tr>`;
+    }).join("");
+  }
+
   document.getElementById("desagSub").textContent =
-    `Desagregado sobre ${totalIncluidos} vehículo(s) con cálculo completo (Ecuaciones 4 y 5). La antigüedad se calcula respecto al año actual (${new Date().getFullYear()}).`;
+    `Desagregado sobre ${totalIncluidos} vehículo(s) con cálculo completo (Ecuaciones 4 y 5). La antigüedad se calcula respecto al año actual (${new Date().getFullYear()}). Los vehículos sin grupo asignado se agrupan como "Sin clasificar".`;
 }
 
 function renderValorizacion() {
@@ -982,7 +1089,7 @@ document.getElementById("btnCalcular").addEventListener("click", () => {
 });
 
 document.getElementById("btnAgregarFila").addEventListener("click", () => {
-  flota.push({ empresa:"", placa:"", categoria:"M2", anio_modelo:null, combustible:"", ruta:"", distancia_ruta_km:null, viajes_dia:null, dias_operacion_anio:365 });
+  flota.push({ empresa:"", placa:"", categoria:"M2", grupo:"", anio_modelo:null, combustible:"", ruta:"", distancia_ruta_km:null, viajes_dia:null, dias_operacion_anio:365 });
   renderTabla();
   renderResumen();
   renderDesagregacion();
@@ -997,11 +1104,36 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
   reader.onload = (evt) => {
     const wb = XLSX.read(evt.target.result, { type: "binary" });
     const ws = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+
+    const normalizar = (s) => (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const metaLabels = { "ciudad":"ciudad", "ubigeo":"ubigeo", "fuente":"fuente", "fecha de actualizacion":"fecha_actualizacion" };
+
+    let headerRowIdx = -1;
+    rows.forEach((row, i) => {
+      if (headerRowIdx !== -1) return;
+      const label = normalizar(row[0]);
+      if (metaLabels[label]) metadata[metaLabels[label]] = (row[1] || "").toString().trim();
+      const hayEncabezado = row.some(c => ["empresa","grupo"].includes(normalizar(c)));
+      if (hayEncabezado) headerRowIdx = i;
+    });
+    renderMetadata();
+
+    let json;
+    if (headerRowIdx >= 0) {
+      const headers = rows[headerRowIdx].map(h => (h||"").toString().trim());
+      json = rows.slice(headerRowIdx + 1)
+        .filter(r => r.some(c => c !== "" && c !== undefined))
+        .map(r => { const obj = {}; headers.forEach((h, idx) => obj[h] = r[idx] !== undefined ? r[idx] : ""); return obj; });
+    } else {
+      json = XLSX.utils.sheet_to_json(ws, { defval: "" });
+    }
+
     flota = json.map(r => ({
       empresa: r.Empresa || r.empresa || "",
       placa: r.Placa || r.placa || "",
       categoria: (r.Categoria || r["Categoría"] || r.categoria || "M2").toString().trim(),
+      grupo: (r.Grupo || r.grupo || r.Clasificacion || r["Clasificación"] || "").toString().trim().toUpperCase(),
       anio_modelo: parseInt(r["Año Modelo"] || r.Anio_Modelo || r.anio_modelo) || null,
       combustible: r.Combustible || r.combustible || "",
       ruta: r.Ruta || r.ruta || "",
@@ -1021,7 +1153,7 @@ document.getElementById("btnExportar").addEventListener("click", () => {
   const data = flota.map(v => {
     calcularVehiculo(v);
     const row = {
-      Empresa: v.empresa, Placa: v.placa, Categoria: v.categoria, Anio_Modelo: v.anio_modelo,
+      Grupo: v.grupo || "", Empresa: v.empresa, Placa: v.placa, Categoria: v.categoria, Anio_Modelo: v.anio_modelo,
       Combustible: v.combustible, Ruta: v.ruta, Distancia_ruta_km: v.distancia_ruta_km,
       Viajes_dia: v.viajes_dia, Dias_operacion_anio: v.dias_operacion_anio,
       Codigo_factor: v._codigo || "", RP_km_anio: v._rp || ""
@@ -1032,25 +1164,54 @@ document.getElementById("btnExportar").addEventListener("click", () => {
     row.Estado = estadoVehiculo(v).txt;
     return row;
   });
-  const ws = XLSX.utils.json_to_sheet(data);
+  const metaRows = [
+    ["Ciudad", metadata.ciudad || ""],
+    ["Ubigeo", metadata.ubigeo || ""],
+    ["Fuente", metadata.fuente || ""],
+    ["Fecha de actualización", metadata.fecha_actualizacion || ""],
+    []
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(metaRows);
+  XLSX.utils.sheet_add_json(ws, data, { origin: -1 });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Emisiones");
   XLSX.writeFile(wb, "emisiones_transporte_publico.xlsx");
 });
 
 document.getElementById("btnPlantilla").addEventListener("click", () => {
-  const ws = XLSX.utils.json_to_sheet([{
-    Empresa:"", Placa:"", Categoria:"M2", "Año Modelo":"", Combustible:"", Ruta:"",
-    Distancia_ruta_km:"", Viajes_dia:"", Dias_operacion_anio:365
-  }]);
+  const metaRows = [
+    ["Ciudad", "", "", "", "", "Ver la pestaña 'Valores válidos' →"],
+    ["Ubigeo", ""],
+    ["Fuente", ""],
+    ["Fecha de actualización", ""],
+    []
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(metaRows);
+  XLSX.utils.sheet_add_json(ws, [{
+    Grupo:"", Empresa:"", Placa:"ABC-123", "Categoría":"M2", "Año Modelo":"", Combustible:"Diesel", Ruta:"",
+    "Distancia ruta (km)":"", "Viajes/día":"", "Días op./año":365
+  }], { origin: -1 });
+
+  const wsLeyenda = XLSX.utils.aoa_to_sheet([
+    ["CATEGORÍA VEHICULAR", "", "Usar exactamente uno de estos valores en la columna 'Categoría':"],
+    ["L", "M1", "M2", "M3", "N1", "N2", "N3"],
+    [],
+    ["COMBUSTIBLE", "", "Usar exactamente uno de estos valores en la columna 'Combustible':"],
+    ["Diesel", "Gasolina", "GLP", "GNV", "Hibrido", "Electrico"],
+    [],
+    ["PLACA", "", "Texto libre, cualquier formato es válido. Ejemplo:"],
+    ["ABC-123"]
+  ]);
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
+  XLSX.utils.book_append_sheet(wb, wsLeyenda, "Valores válidos");
   XLSX.writeFile(wb, "plantilla_emisiones_transporte_publico.xlsx");
 });
 
 document.getElementById("btnGuardarSesion").addEventListener("click", () => {
-  const sesion = { fecha_exportacion: new Date().toISOString(), vehiculos: flota.map(v => ({
-    empresa:v.empresa, placa:v.placa, categoria:v.categoria, anio_modelo:v.anio_modelo,
+  const sesion = { fecha_exportacion: new Date().toISOString(), metadata: { ...metadata }, vehiculos: flota.map(v => ({
+    grupo:v.grupo||"", empresa:v.empresa, placa:v.placa, categoria:v.categoria, anio_modelo:v.anio_modelo,
     combustible:v.combustible, ruta:v.ruta, distancia_ruta_km:v.distancia_ruta_km,
     viajes_dia:v.viajes_dia, dias_operacion_anio:v.dias_operacion_anio
   }))};
@@ -1068,6 +1229,8 @@ document.getElementById("sessionInput").addEventListener("change", (e) => {
   reader.onload = (evt) => {
     const sesion = JSON.parse(evt.target.result);
     flota = sesion.vehiculos || [];
+    metadata = Object.assign({ ciudad:"", ubigeo:"", fuente:"", fecha_actualizacion:"" }, sesion.metadata || {});
+    renderMetadata();
     renderTabla();
     renderResumen();
     renderDesagregacion();
