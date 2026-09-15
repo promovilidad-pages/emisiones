@@ -760,6 +760,28 @@ const CATEGORIAS = ["L","M1","M2","M3","N1","N2","N3"];
 let flota = [];
 let metadata = { ciudad:"", ubigeo:"", fuente:"", fecha_actualizacion:"" };
 
+// El input type="date" del navegador SIEMPRE guarda/exige formato ISO (aaaa-mm-dd).
+// Estas funciones convierten hacia/desde ese formato para que el Excel muestre dd/mm/aaaa
+// (como se acostumbra en Perú) y para poder leer de vuelta una fecha escrita o pegada
+// en la plantilla, sea que Excel la haya guardado como texto o como fecha real (número de serie).
+function parseFechaToISO(val) {
+  if (val === "" || val === undefined || val === null) return "";
+  if (typeof val === "number" && typeof XLSX !== "undefined" && XLSX.SSF) {
+    const d = XLSX.SSF.parse_date_code(val);
+    if (d) return `${d.y}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`;
+  }
+  const s = val.toString().trim();
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) return s;
+  m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+  return "";
+}
+function isoToDDMMYYYY(iso) {
+  const m = (iso || "").toString().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || "");
+}
+
 function renderMetadata() {
   document.getElementById("metaCiudad").value = metadata.ciudad || "";
   document.getElementById("metaUbigeo").value = metadata.ubigeo || "";
@@ -1113,7 +1135,10 @@ document.getElementById("fileInput").addEventListener("change", (e) => {
     rows.forEach((row, i) => {
       if (headerRowIdx !== -1) return;
       const label = normalizar(row[0]);
-      if (metaLabels[label]) metadata[metaLabels[label]] = (row[1] || "").toString().trim();
+      if (metaLabels[label]) {
+        const key = metaLabels[label];
+        metadata[key] = key === "fecha_actualizacion" ? parseFechaToISO(row[1]) : (row[1] || "").toString().trim();
+      }
       const hayEncabezado = row.some(c => ["empresa","grupo"].includes(normalizar(c)));
       if (hayEncabezado) headerRowIdx = i;
     });
@@ -1168,7 +1193,7 @@ document.getElementById("btnExportar").addEventListener("click", () => {
     ["Ciudad", metadata.ciudad || ""],
     ["Ubigeo", metadata.ubigeo || ""],
     ["Fuente", metadata.fuente || ""],
-    ["Fecha de actualización", metadata.fecha_actualizacion || ""],
+    ["Fecha de actualización", isoToDDMMYYYY(metadata.fecha_actualizacion)],
     []
   ];
   const ws = XLSX.utils.aoa_to_sheet(metaRows);
