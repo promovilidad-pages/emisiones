@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Módulo de Emisiones — Transporte Público</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
   :root {
     --ink: #1B2420;
@@ -70,7 +71,7 @@
     background: var(--paper); color: var(--ink);
     box-shadow: none;
   }
-  .tab svg { width: 13px; height: 13px; opacity: .9; }
+  .tab svg, .tab i { width: 13px; height: 13px; font-size: 13px; opacity: .9; }
   .header-mark {
     flex-shrink: 0; height: 34px; width: auto; max-width: 160px;
     display: flex; align-items: center; justify-content: center;
@@ -118,6 +119,7 @@
     padding: 0;
   }
   .modal-close svg { width: 14px; height: 14px; }
+  .modal-close i { font-size: 14px; }
   .modal-close:hover { background: var(--paper); color: var(--ink); }
   .modal-body { padding: 6px 22px 26px; max-height: 74vh; overflow-y: auto; overflow-x: hidden; }
 
@@ -128,6 +130,7 @@
     padding: 22px 24px; box-shadow: var(--shadow-sm);
   }
   .panel h2 { font-size: 14px; margin: 0 0 4px; font-weight: 700; letter-spacing: .02em; color: var(--ink); }
+  .panel h2 i, .modal-head h2 i { color: var(--moss); font-size: 13px; margin-right: 2px; }
   .panel .sub { font-size: 12.5px; color: var(--muted); margin: 0 0 18px; line-height: 1.55; max-width: 74ch; }
 
   /* ---------- Step sequence (panels 1–5) ---------- */
@@ -160,6 +163,7 @@
   .btn-primary:hover { background: var(--moss-dark); }
   .btn-ghost:hover { border-color: var(--moss); background: var(--moss-soft); transform: none; }
   .btn-ghost svg, .btn-primary svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .9; }
+  .btn-ghost i, .btn-primary i, .metoToggle i { width: 14px; text-align: center; font-size: 13px; flex-shrink: 0; opacity: .9; }
   input[type=file] { font-size: 12px; color: var(--muted); max-width: 210px; }
   .file-name { font-size: 12.5px; color: var(--muted); }
 
@@ -296,16 +300,16 @@
     </div>
     <div class="nav-tabs">
       <button class="tab active" data-tab="datos" onclick="switchTab('datos')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+        <i class="fa-solid fa-file-arrow-up"></i>
         Datos
       </button>
       <button class="tab" data-tab="resultados" onclick="switchTab('resultados')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h4V10H4z"/><path d="M10 19h4V5h-4z"/><path d="M16 19h4v-7h-4z"/></svg>
+        <i class="fa-solid fa-chart-column"></i>
         Resultados
       </button>
     </div>
     <button class="btn-ghost" id="metoToggle">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 2h3v14H5V6h3l1-2z"/><path d="M9 11h6"/><path d="M9 15h6"/></svg>
+      <i class="fa-solid fa-book"></i>
       Metodología
     </button>
   </div>
@@ -316,9 +320,9 @@
   <div class="modal-backdrop" id="metoPanel">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>METODOLOGÍA Y CRITERIOS APLICADOS</h2>
+        <h2><i class="fa-solid fa-book-open"></i> METODOLOGÍA Y CRITERIOS APLICADOS</h2>
         <button class="modal-close" id="metoClose" aria-label="Cerrar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <div class="modal-body meto-body">
@@ -559,22 +563,22 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
-    <h2>CARGAR DATOS</h2>
+    <h2><i class="fa-solid fa-cloud-arrow-up"></i> CARGAR DATOS</h2>
     <p class="sub">Importa el Excel de flota remitido por el gobierno local.</p>
     <div class="row-actions">
       <label class="btn-ghost" for="fileInput">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+        <i class="fa-solid fa-file-arrow-up"></i>
         Seleccionar archivo
         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;">
       </label>
       <span class="file-name" id="fileNameLabel">Ningún archivo seleccionado</span>
-      <button class="btn-ghost" id="btnPlantilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>Descargar plantilla</button>
-      <button class="btn-ghost" id="btnAgregarFila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Agregar fila manual</button>
-      <button class="btn-primary" id="btnCalcular"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h2"/><path d="M14 12h2"/><path d="M8 16h2"/><path d="M14 16h2"/></svg>Calcular emisiones</button>
-      <button class="btn-ghost" id="btnExportar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>Exportar resultados (Excel)</button>
-      <button class="btn-ghost" id="btnGuardarSesion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4"/><path d="M8 14h8v6H8z"/></svg>Guardar sesión (JSON)</button>
+      <button class="btn-ghost" id="btnPlantilla"><i class="fa-solid fa-download"></i>Descargar plantilla</button>
+      <button class="btn-ghost" id="btnAgregarFila"><i class="fa-solid fa-plus"></i>Agregar fila manual</button>
+      <button class="btn-primary" id="btnCalcular"><i class="fa-solid fa-calculator"></i>Calcular emisiones</button>
+      <button class="btn-ghost" id="btnExportar"><i class="fa-solid fa-file-export"></i>Exportar resultados (Excel)</button>
+      <button class="btn-ghost" id="btnGuardarSesion"><i class="fa-solid fa-floppy-disk"></i>Guardar sesión (JSON)</button>
       <label class="btn-ghost" style="display:inline-flex;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l4-4h8l4 4"/><path d="M4 7v13h16V7"/><path d="M9 13l3 3 3-3"/><path d="M12 8v8"/></svg>
+        <i class="fa-solid fa-folder-open"></i>
         Cargar sesión
         <input type="file" id="sessionInput" accept=".json" style="display:none;">
       </label>
@@ -586,7 +590,7 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
-    <h2>DATOS DE LA CIUDAD</h2>
+    <h2><i class="fa-solid fa-city"></i> DATOS DE LA CIUDAD</h2>
     <p class="sub">Datos de referencia de esta evaluación. Se guardan junto con la flota al exportar o descargar la plantilla, y quedan disponibles como base de datos por ciudad.</p>
     <div class="meta-grid">
       <div class="meta-field">
@@ -613,7 +617,7 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
-    <h2>FLOTA PARA EVALUAR</h2>
+    <h2><i class="fa-solid fa-bus"></i> FLOTA PARA EVALUAR</h2>
     <p class="sub">Todos los datos vienen del reporte, pero también es editable dentro de la app.</p>
     <div class="tbl-wrap">
       <table id="tblFlota">
@@ -639,7 +643,7 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
-    <h2>RESUMEN DE EMISIONES</h2>
+    <h2><i class="fa-solid fa-smog"></i> RESUMEN DE EMISIONES</h2>
     <p class="sub" id="resumenSub">Totales anuales de la flota cargada. Vehículos sin vueltas/día completadas no se incluyen en el total (aparecen como "pendiente").</p>
     <div id="kpiGrid">
       <div class="kpi-cluster gei">
@@ -672,7 +676,7 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
-    <h2>DESAGREGACIÓN DE RESULTADOS</h2>
+    <h2><i class="fa-solid fa-chart-pie"></i> DESAGREGACIÓN DE RESULTADOS</h2>
     <p class="sub" id="desagSub">Emisiones totales por tipo de combustible, antigüedad vehicular y clasificación vehicular (Ecuaciones 4 y 5), solo con los vehículos que tienen cálculo completo.</p>
 
     <div class="twocol-grid">
@@ -720,7 +724,7 @@
   <div class="step">
     <div class="step-body">
   <div class="panel">
-    <h2>VALORIZACIÓN ECONÓMICA (EXTERNALIDAD NEGATIVA)</h2>
+    <h2><i class="fa-solid fa-sack-dollar"></i> VALORIZACIÓN ECONÓMICA (EXTERNALIDAD NEGATIVA)</h2>
     <p class="sub" id="valorSub">Emisiones totales convertidas a US$/año usando el costo social por contaminante (Herramienta PCH, MTC). Se aplica sobre las toneladas/año ya calculadas con tu RP real, no sobre el promedio genérico del Excel.</p>
     <div class="tbl-wrap" style="max-height:none;">
       <table id="tblValor">
